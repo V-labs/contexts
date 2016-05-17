@@ -10,6 +10,13 @@ class RestContext extends BaseContext
 {
     private $request;
 
+    /**
+     * Used to store key/values to be used in steps
+     *
+     * @var array
+     */
+    private $storedVars = [];
+
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -153,7 +160,7 @@ class RestContext extends BaseContext
         return $this->request->getHttpHeader($name);
     }
 
-   /**
+    /**
      * Checks, that the response header expire is in the future
      *
      * @Then the response should expire in the future
@@ -229,5 +236,72 @@ class RestContext extends BaseContext
         }
 
         echo "curl -X $method$data$headers '$url'";
+    }
+
+    /**
+     * Store given variable in array
+     *
+     * @param string $text
+     *
+     * @Then /^I want to store the "([^"]*)" property from response in stored values$/
+     */
+    public function storeVarInStoredVars($text)
+    {
+        $actual = json_decode($this->request->getContent());
+        $this->storedVars[$text] = $actual->$text;
+    }
+
+    /**
+     * Store given variable in array
+     *
+     * @param string $value
+     * @param string $compareWith
+     *
+     * @Then /^I want to compare the "([^"]*)" value from response with "([^"]*)" in stored values$/
+     */
+    public function compareVarToStoredVar($value, $compareWith)
+    {
+        $actual = json_decode($this->request->getContent());
+        $responseValue = $actual->$value;
+        $this->assertEquals($this->storedVars[$compareWith], $responseValue);
+    }
+
+    /**
+     * Remove given variable in stored vars
+     *
+     * @param string $text
+     *
+     * @Then /^I want to remove the "([^"]*)" property from stored values$/
+     */
+    public function removeVarInStoredVars($text)
+    {
+        unset($this->storedVars[$text]);
+    }
+
+    /**
+     * Set header from stored vars
+     *
+     * @param string $headerName
+     * @param string $var
+     *
+     * @Then /^I set header "([^"]*)" with value "([^"]*)" from stored values$/
+     */
+    public function setHeaderFromStoredVars($headerName, $var)
+    {
+        $this->request->setHttpHeader($headerName, $this->storedVars[$var]);
+    }
+
+    /**
+     * Set OAuth Authorization header from stored vars
+     *
+     * @param string $storedVarName
+     *
+     * @Then /^I set authorization header with value "([^"]*)" from stored values$/
+     */
+    public function setAuthorizationHeaderFromStoredVars($storedVarName)
+    {
+        $headerValue = sprintf('Bearer %s', $this->storedVars[$storedVarName]);
+
+        $this->request->setHttpHeader("Authorization", $headerValue);
     }
 }
