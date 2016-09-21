@@ -304,4 +304,16 @@ class RestContext extends BaseContext
 
         $this->request->setHttpHeader("Authorization", $headerValue);
     }
+
+    /**
+     * Store a value from Request Headers in array
+     *
+     * @param $name
+     * @Then /^I want to store the "([^"]*)" property from headers in stored values$/
+     */
+    public function storeVarFromHeadersInStoredVars($name)
+    {
+        $value = $this->request->getHttpHeader($name);
+        $this->storedVars[$name] = $value;
+    }
 }
