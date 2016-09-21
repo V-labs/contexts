@@ -316,4 +316,12 @@ class RestContext extends BaseContext
         $value = $this->request->getHttpHeader($name);
         $this->storedVars[$name] = $value;
     }
+
+    /**
+     * @Then /^I send a "([^"]*)" password recovery request with "([^"]*)" value from stored values$/
+     */
+    public function iSendPasswordRecoveryRequestWithToken($method, $name)
+    {
+        $this->iSendARequestTo($method, sprintf('/users/reset-password/%s', $this->storedVars[$name]));
+    }
 }
