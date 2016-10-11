@@ -343,4 +343,18 @@ class JsonContext extends BaseContext
             );
         }
     }
+
+    /**
+     * @Then the JSON node :node length should be equal to :number
+     */
+    public function theJsonNodeLengthShouldBeEqualTo($node, $number)
+    {
+        $json = $this->getJson();
+
+        $actual = $this->inspector->evaluate($json, $node);
+
+        if(strlen($actual) != $number){
+            throw new \Exception(sprintf('The node value %s does not have a length of %s characters', $actual, $number));
+        }
+    }
 }
