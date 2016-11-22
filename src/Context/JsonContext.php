@@ -357,4 +357,18 @@ class JsonContext extends BaseContext
             throw new \Exception(sprintf('The node value %s does not have a length of %s characters', $actual, $number));
         }
     }
+
+    /**
+     * Checks, that given JSON node has atleast N element(s)
+     *
+     * @Then the JSON node :node should have at least :count element(s)
+     */
+    public function theJsonNodeShouldHaveAtleastElements($node, $count)
+    {
+        $json = $this->getJson();
+
+        $actual = $this->inspector->evaluate($json, $node);
+
+        $this->assertTrue(sizeof((array) $actual) > $count);
+    }
 }
