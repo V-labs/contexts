@@ -158,7 +158,7 @@ class RestContext extends BaseContext
     /**
      * @Then the header :name should exist
      */
-    protected function theHeaderShouldExist($name)
+    public function theHeaderShouldExist($name)
     {
         return $this->request->getHttpHeader($name);
     }
