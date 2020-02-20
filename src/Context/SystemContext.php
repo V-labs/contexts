@@ -1,8 +1,7 @@
 <?php
 
-namespace Sanpi\Behatch\Context;
+namespace Behatch\Context;
 
-use Behat\Behat\Context\Step;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 
@@ -22,20 +21,6 @@ class SystemContext implements Context
     public static function getTranslationResources()
     {
         return glob(__DIR__ . '/../../i18n/*.xliff');
-    }
-
-    /**
-     * Uploads a file using the specified input field
-     *
-     * @When (I )put the file :file into :field
-     */
-    public function putFileIntoField($file, $field)
-    {
-        $path = $this->root . DIRECTORY_SEPARATOR . $file;
-
-        return [
-            new Step\When("I attach the file '$path' to '$field'")
-        ];
     }
 
     /**
@@ -61,6 +46,16 @@ class SystemContext implements Context
     {
         $cmd = $this->root . DIRECTORY_SEPARATOR . $cmd;
         $this->iExecute($cmd);
+    }
+
+    /**
+     * Display the last command output
+     *
+     * @Then (I )display the last command output
+     */
+    public function iDumpCommandOutput()
+    {
+        echo implode(PHP_EOL, $this->output);
     }
 
     /**
@@ -93,7 +88,7 @@ class SystemContext implements Context
     public function commandShouldLastLessThan($seconds)
     {
         if ($this->lastExecutionTime > $seconds) {
-            throw new \Exception(sprintf("Last command last %s which is more than %s seconds", $lastExecutionTime, $seconds));
+            throw new \Exception(sprintf("Last command last %s which is more than %s seconds", $this->lastExecutionTime, $seconds));
         }
     }
 
@@ -105,7 +100,7 @@ class SystemContext implements Context
     public function commandShouldMoreLessThan($seconds)
     {
         if ($this->lastExecutionTime < $seconds) {
-            throw new \Exception(sprintf("Last command last %s which is less than %s seconds", $lastExecutionTime, $seconds));
+            throw new \Exception(sprintf("Last command last %s which is less than %s seconds", $this->lastExecutionTime, $seconds));
         }
     }
 
@@ -136,7 +131,7 @@ class SystemContext implements Context
      *
      * @Then output should not contain :text
      */
-    public function ouputShouldNotContain($text)
+    public function outputShouldNotContain($text)
     {
         $regex = '~'.$text.'~ui';
 

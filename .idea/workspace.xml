@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="6ca83f39-d75b-457e-964b-3d4788533064" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.atoum.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.bootstrap.atoum.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.scrutinizer.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CONTRIBUTING.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/behat.yml.dist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/main" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/stub.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/box.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc/index.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/i18n/en.xliff.dist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/i18n/fr.xliff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/i18n/ja.xliff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/i18n/pt.xliff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Context/BaseContext.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Context/BrowserContext.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Context/ContextClass/ClassResolver.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Context/DebugContext.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Context/JsonContext.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Context/RestContext.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Context/SystemContext.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Context/TableContext.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Context/XmlContext.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Extension.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/ContextSupportedVoter.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/ContextSupportedVoters.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/FilterableHttpCallResult.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/HttpCallListener.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/HttpCallResult.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/HttpCallResultPool.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/HttpCallResultPoolResolver.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/Request.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/Request/BrowserKit.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/Request/Goutte.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpCall/RestContextVoter.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Json/Json.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Json/JsonInspector.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Json/JsonSchema.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Resources/schemas/atom.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Resources/schemas/rss-2.0.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Resources/services/http_call.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Xml/Dom.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/bootstrap/Bootstrap.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/browser.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/debug.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/fr/browser.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/fr/debug.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/fr/json.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/fr/rest.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/fr/system.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/fr/table.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/fr/xml.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/ja/browser.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/ja/debug.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/ja/json.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/ja/rest.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/ja/system.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/ja/table.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/ja/xml.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/json.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/pt/browser.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/pt/debug.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/pt/json.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/pt/rest.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/pt/system.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/pt/table.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/pt/xml.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/rest.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/system.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/table.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/features/xml.feature" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/files/lorem.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/browser/auth.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/browser/elements.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/browser/frames.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/browser/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/browser/timeout.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/arraywithtypes.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/definitions.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/emptyarray.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/emptyobject.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/imajson.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/imnotajson.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/rootarray.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/schema.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/schemaref.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/withref-invalid.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/json/withref.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/rest/index.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/table/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/book.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/country.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/feed.atom" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/feed.rss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/feed.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/imnotaxml.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/needsformatting.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/people.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/schema.dtd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/schema.ng" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/fixtures/www/xml/schema.xsd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/units/Json/Json.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/units/Json/JsonInspector.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/units/Json/JsonSchema.php" beforeDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution>
+      <executable />
+    </execution>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1Y4B3CYwDtMarG9poxfszYsm3qA" />
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="reference.webide.settings.project.settings.php" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6ca83f39-d75b-457e-964b-3d4788533064" name="Default Changelist" comment="" />
+      <created>1582191784463</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1582191784463</updated>
+      <workItem from="1582191785574" duration="103000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

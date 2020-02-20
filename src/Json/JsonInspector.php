@@ -1,10 +1,8 @@
 <?php
 
-namespace Sanpi\Behatch\Json;
+namespace Behatch\Json;
 
-use JsonSchema\RefResolver;
 use JsonSchema\Validator;
-use JsonSchema\Uri\UriRetriever;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class JsonInspector
@@ -34,9 +32,11 @@ class JsonInspector
 
     public function validate(Json $json, JsonSchema $schema)
     {
-        return $schema
-            ->resolve(new RefResolver(new UriRetriever))
-            ->validate($json, new Validator)
-        ;
+        $validator = new \JsonSchema\Validator();
+
+        $resolver = new \JsonSchema\SchemaStorage(new \JsonSchema\Uri\UriRetriever, new \JsonSchema\Uri\UriResolver);
+        $schema->resolve($resolver);
+
+        return $schema->validate($json, $validator);
     }
 }

@@ -1,8 +1,6 @@
 <?php
 
-namespace Sanpi\Behatch\HttpCall\Request;
-
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+namespace Behatch\HttpCall\Request;
 
 class Goutte extends BrowserKit
 {
@@ -16,34 +14,28 @@ class Goutte extends BrowserKit
 
     public function send($method, $url, $parameters = [], $files = [], $content = null, $headers = [])
     {
-        foreach ($files as $originalName => &$file) {
-            $file = new UploadedFile($file, $originalName);
-        }
-        $page = parent::send($method, $url, $parameters, $files, $content, $this->requestHeaders);
+        $page = parent::send($method, $url, $parameters, $files, $content, array_merge($headers, $this->requestHeaders));
         $this->resetHttpHeaders();
 
         return $page;
     }
 
-    public function getServer()
-    {
-        return $this->getRequest()
-            ->server->all();
-    }
-
-    public function getParameters()
-    {
-        return $this->getRequest()
-            ->query->all();
-    }
-
     public function setHttpHeader($name, $value)
     {
-        $name = strtoupper("http_$name");
+        /* taken from Behat\Mink\Driver\BrowserKitDriver::setRequestHeader */
+        $contentHeaders = array('CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true);
+        $name = str_replace('-', '_', strtoupper($name));
+
+        // CONTENT_* are not prefixed with HTTP_ in PHP when building $_SERVER
+        if (!isset($contentHeaders[$name])) {
+            $name = 'HTTP_' . $name;
+        }
+        /* taken from Behat\Mink\Driver\BrowserKitDriver::setRequestHeader */
+
         $this->requestHeaders[$name] = $value;
     }
 
-    private function resetHttpHeaders()
+    protected function resetHttpHeaders()
     {
         $this->requestHeaders = [];
     }

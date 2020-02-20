@@ -42,7 +42,11 @@ Feature: Browser Feature
         And the "months_selector" select box should not contain "december"
         And the "months_selector" select box should contain "january"
         When I click on the 1st "ul li" element
-        Then I should see "You clicked First"
+        Then I should see "You clicked First LI"
+        When I press the 2nd "Submit" button
+        Then I should see "You clicked Second BUTTON"
+        When I follow the 1st "Second" link
+        Then I should see "You clicked Second A"
 
     @javascript
     Scenario: Frames testing
@@ -58,10 +62,22 @@ Feature: Browser Feature
     @javascript
     Scenario: Wait before seeing
         Given I am on "/browser/timeout.html"
-        Then I wait 3 seconds until I see "timeout"
+        When I wait 3 seconds until I see "timeout"
         And I wait 1 second
         And I wait for "#iframe" element
         And I wait 5 seconds for "#iframe" element
+        Then the total elapsed time should be more than 1 seconds
+
+    @javascript
+    Scenario: Waited upon text should actually be visible
+        Given I am on "/browser/timeout.html"
+        Then I should not see "timeout"
+        When I wait 3 seconds until I see "timeout"
+        Then I should see "timeout"
+
+    Scenario: Waited upon text should actually be visible
+        Given I am on "/browser/index.html"
+        Then I should not see "foobar" within 1 second
 
     @javascript
     Scenario: Check element visibility
@@ -75,7 +91,13 @@ Feature: Browser Feature
         Then I fill in "today" with the current date
         And I fill in "today" with the current date and modifier "-1 day"
 
-
     Scenario:
         Given I am on "/browser/elements.html"
         Then i save the value of "today" in the "today" parameter
+
+    Scenario: Waiting for fractions of a second
+        Given I am on "/browser/index.html"
+        And I wait 1.9 seconds
+        And I wait 1.9 seconds
+        And I wait 1.9 seconds
+        Then the total elapsed time should be more than 4 seconds

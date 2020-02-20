@@ -22,22 +22,25 @@ Feature: Testing JSONContext
         And the JSON node "foo" should contain "bar"
         And the JSON node "foo" should not contain "something else"
 
-        And the JSON node "numbers[0]" should contain "one"
+        And the JSON node "numbers[0]" should contain "öne"
         And the JSON node "numbers[1]" should contain "two"
         And the JSON node "numbers[2]" should contain "three"
         And the JSON node "numbers[3].complexeshizzle" should be equal to "true"
         And the JSON node "numbers[3].so[0]" should be equal to "very"
         And the JSON node "numbers[3].so[1].complicated" should be equal to "indeed"
+        And the JSON node "numbers[0]" should match "/ö.{1}e/"
+        And the JSON node "numbers[1]" should match "/.{2}o/"
+        And the JSON node "numbers[2]" should match "/[a-z]{3}e.+/"
 
         And the JSON nodes should be equal to:
             | foo        | bar   |
-            | numbers[0] | one   |
+            | numbers[0] | öne   |
             | numbers[1] | two   |
             | numbers[2] | three |
 
         And the JSON nodes should contain:
             | foo        | bar   |
-            | numbers[0] | one   |
+            | numbers[0] | öne   |
             | numbers[1] | two   |
             | numbers[2] | three |
 
@@ -91,6 +94,43 @@ Feature: Testing JSONContext
             }
             """
 
+    Scenario: Json validation deep
+        Given I am on "/json/booking.json"
+        Then the JSON should be invalid according to this schema:
+            """
+            {
+                "type":"object",
+                "$schema": "http://json-schema.org/draft-03/schema",
+                "required":false,
+                "properties":{
+                    "Booking": {
+                        "type":"object",
+                        "required":false
+                    },
+                    "Metadata": {
+                        "type":"object",
+                        "required":false,
+                        "properties":{
+                            "First": {
+                                "type":"object",
+                                "required":false,
+                                "properties":{
+                                    "default_value": {
+                                        "type":"boolean",
+                                        "required":false
+                                    },
+                                    "enabled": {
+                                        "type":"boolean",
+                                        "required":true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+
     Scenario: Json contents validation
         Given I am on "/json/imajson.json"
         Then the JSON should be equal to:
@@ -98,7 +138,7 @@ Feature: Testing JSONContext
             {
                 "foo": "bar",
                 "numbers": [
-                    "one",
+                    "öne",
                     "two",
                     "three",
                     {
@@ -131,3 +171,28 @@ Feature: Testing JSONContext
         And the JSON node "root[4]" should be equal to the number 1312
         And the JSON node "root[4]" should be equal to the number 1312.0
         And the JSON node "root[5]" should be equal to the number 1936.2
+
+    Scenario: Check not null values
+        Given I am on "/json/notnullvalues.json"
+        Then the response should be in JSON
+        And the JSON node '' should have 5 elements
+        And the JSON node "one" should not be null
+        And the JSON node "one" should be false
+        And the JSON node "two" should not be null
+        And the JSON node "two" should be true
+        And the JSON node "three" should not be null
+        And the JSON node "three" should be equal to the string ""
+        And the JSON node "four" should not be null
+        And the JSON node "four" should be equal to the string "foo"
+        And the JSON node "five" should not be null
+        And the JSON node "five" should be equal to the number 5
+
+    Scenario: Json validation against swagger dump file
+        Given I am on "/json/swaggerpartial.json"
+        Then the response should be in JSON
+        And the JSON should be valid according to swagger "tests/fixtures/www/json/swagger.json" dump schema "sample-definition"
+
+    Scenario: Json validation against swagger dump file
+        Given I am on "/json/swaggerpartial.json"
+        Then the response should be in JSON
+        And the JSON should not be valid according to swagger "tests/fixtures/www/json/swagger.json" dump schema "sample-invalid-definition"

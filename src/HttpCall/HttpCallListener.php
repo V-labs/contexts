@@ -1,6 +1,6 @@
 <?php
 
-namespace Sanpi\Behatch\HttpCall;
+namespace Behatch\HttpCall;
 
 use Behat\Behat\EventDispatcher\Event\StepTested;
 use Behat\Behat\EventDispatcher\Event\AfterStepTested;
@@ -25,9 +25,9 @@ class HttpCallListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
            StepTested::AFTER => 'afterStep'
-        );
+        ];
     }
 
     public function afterStep(AfterStepTested $event)

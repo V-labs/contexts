@@ -1,8 +1,10 @@
 <?php
 
-namespace Sanpi\Behatch\HttpCall\Request;
+namespace Behatch\HttpCall\Request;
 
+use Behat\Mink\Driver\Goutte\Client as GoutteClient;
 use Behat\Mink\Mink;
+use Symfony\Component\BrowserKit\Client as BrowserKitClient;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class BrowserKit
@@ -58,7 +60,9 @@ class BrowserKit
     public function send($method, $url, $parameters = [], $files = [], $content = null, $headers = [])
     {
         foreach ($files as $originalName => &$file) {
-            $file = new UploadedFile($file, $originalName);
+            if (is_string($file)) {
+                $file = new UploadedFile($file, $originalName);
+            }
         }
 
         $client = $this->mink->getSession()->getDriver()->getClient();
@@ -81,7 +85,7 @@ class BrowserKit
             // Symfony\Component\BrowserKit\Client
 
             /* taken from Behat\Mink\Driver\BrowserKitDriver::setRequestHeader */
-            $contentHeaders = array('CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true);
+            $contentHeaders = ['CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true];
             $name = str_replace('-', '_', strtoupper($name));
 
             // CONTENT_* are not prefixed with HTTP_ in PHP when building $_SERVER
@@ -104,18 +108,22 @@ class BrowserKit
 
     public function getHttpHeader($name)
     {
+        $values = $this->getHttpRawHeader($name);
+
+        return implode(', ', $values);
+    }
+
+    public function getHttpRawHeader($name)
+    {
         $name = strtolower($name);
         $headers = $this->getHttpHeaders();
 
         if (isset($headers[$name])) {
-            if (is_array($headers[$name])) {
-                $value = implode(', ', $headers[$name]);
+            $value = $headers[$name];
+            if (!is_array($headers[$name])) {
+                $value = [$headers[$name]];
             }
-            else {
-                $value = $headers[$name];
-            }
-        }
-        else {
+        } else {
             throw new \OutOfBoundsException(
                 "The header '$name' doesn't exist"
             );
@@ -123,13 +131,14 @@ class BrowserKit
         return $value;
     }
 
-    private function resetHttpHeaders()
+    protected function resetHttpHeaders()
     {
+        /** @var GoutteClient|BrowserKitClient $client */
         $client = $this->mink->getSession()->getDriver()->getClient();
 
-        // At this point, `$client` is not supposed to be Goutte\Client
-        // Otherwise, this code is overridden on HttpCall\Request\Goutte
-        /** @var \Symfony\Component\BrowserKit\Client $client */
         $client->setServerParameters([]);
+        if ($client instanceof GoutteClient) {
+            $client->restart();
+        }
     }
 }

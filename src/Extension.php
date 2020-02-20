@@ -1,6 +1,6 @@
 <?php
 
-namespace Sanpi\Behatch;
+namespace Behatch;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -20,6 +20,9 @@ class Extension implements ExtensionInterface
 
     public function initialize(ExtensionManager $extensionManager)
     {
+        if (PHP_MAJOR_VERSION === 5) {
+            @trigger_error('The behatch context extension will drop support for PHP 5 in version 4.0', E_USER_DEPRECATED);
+        }
     }
 
     public function process(ContainerBuilder $container)
@@ -41,7 +44,7 @@ class Extension implements ExtensionInterface
 
     private function loadClassResolver(ContainerBuilder $container)
     {
-        $definition = new Definition('Sanpi\Behatch\Context\ContextClass\ClassResolver');
+        $definition = new Definition('Behatch\Context\ContextClass\ClassResolver');
         $definition->addTag(ContextExtension::CLASS_RESOLVER_TAG);
         $container->setDefinition('behatch.class_resolver', $definition);
     }

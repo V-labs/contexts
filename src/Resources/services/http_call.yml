@@ -1,27 +1,33 @@
 services:
     behatch.http_call.listener:
-        class: Sanpi\Behatch\HttpCall\HttpCallListener
+        class: Behatch\HttpCall\HttpCallListener
         arguments: ["@behatch.context_supported.voter", "@behatch.http_call.result_pool", "@mink"]
+        public: false
         tags:
             - { name: event_dispatcher.subscriber, priority: 0 }
 
     behatch.http_call.result_pool:
-        class: Sanpi\Behatch\HttpCall\HttpCallResultPool
+        class: Behatch\HttpCall\HttpCallResultPool
+        public: false
 
     behatch.context_supported.voter:
-        class: Sanpi\Behatch\HttpCall\ContextSupportedVoters
+        class: Behatch\HttpCall\ContextSupportedVoters
+        public: false
 
     behatch.rest_context_supported.voter:
-        class: Sanpi\Behatch\HttpCall\RestContextVoter
+        class: Behatch\HttpCall\RestContextVoter
+        public: false
         tags:
             - { name: behatch.context_voter }
 
-    Behatch.http_call.request:
-        class: Sanpi\Behatch\HttpCall\Request
+    behatch.http_call.request:
+        class: Behatch\HttpCall\Request
         arguments: ["@mink"]
+        public: false
 
     behatch.http_call.argument_resolver:
-        class: Sanpi\Behatch\HttpCall\HttpCallResultPoolResolver
+        class: Behatch\HttpCall\HttpCallResultPoolResolver
         arguments: ["@behatch.http_call.result_pool", "@behatch.http_call.request"]
+        public: false
         tags:
             - { name: context.argument_resolver }

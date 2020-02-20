@@ -1,16 +1,19 @@
 <?php
 
-namespace Sanpi\Behatch\Context;
+namespace Behatch\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Exception\ResponseTextException;
 use Behat\Mink\Exception\ElementNotFoundException;
+use WebDriver\Exception\StaleElementReference;
+use Behat\Behat\Tester\Exception\PendingException;
 
 class BrowserContext extends BaseContext
 {
     private $timeout;
     private $dateFormat = 'dmYHi';
+    private $timerStartedAt;
 
     public function __construct($timeout = 1)
     {
@@ -23,6 +26,16 @@ class BrowserContext extends BaseContext
     public function closeBrowser()
     {
         $this->getSession()->stop();
+    }
+
+    /**
+     * @BeforeScenario
+     *
+     * @When (I )start timing now
+     */
+    public function startTimer()
+    {
+        $this->timerStartedAt = time();
     }
 
     /**
@@ -58,14 +71,8 @@ class BrowserContext extends BaseContext
      */
     public function iClickOnTheNthElement($index, $element)
     {
-        $nodes = $this->getSession()->getPage()->findAll('css', $element);
-
-        if (isset($nodes[$index - 1])) {
-            $nodes[$index - 1]->click();
-        }
-        else {
-            throw new \Exception("The element '$element' number $index was not found anywhere in the page");
-        }
+        $node = $this->findElement('css', $element, $index);
+        $node->click();
     }
 
     /**
@@ -75,17 +82,19 @@ class BrowserContext extends BaseContext
      */
     public function iFollowTheNthLink($index, $link)
     {
-        $page = $this->getSession()->getPage();
+        $node = $this->findElement('named', ['link', $link], $index);
+        $node->click();
+    }
 
-        $links = $page->findAll('named', [
-            'link', $this->getSession()->getSelectorsHandler()->xpathLiteral($link)
-        ]);
-
-        if (!isset($links[$index - 1])) {
-            throw new \Exception("The $index element '$link' was not found anywhere in the page");
-        }
-
-        $links[$index - 1]->click();
+    /**
+     * Presses the nth specified button
+     *
+     * @When (I )press the :index :button button
+     */
+    public function pressTheNthButton($index, $button)
+    {
+        $node = $this->findElement('named', ['button', $button], $index);
+        $node->click();
     }
 
     /**
@@ -150,6 +159,24 @@ class BrowserContext extends BaseContext
     }
 
     /**
+     * Checks, that the page should not contain specified text before given timeout
+     *
+     * @Then (I )should not see :text within :count second(s)
+     */
+    public function iDontSeeInSeconds($count, $text)
+    {
+        $caught = false;
+        try {
+            $this->iWaitSecondsUntilISee($count, $text);
+        }
+        catch (ExpectationException $e) {
+            $caught = true;
+        }
+
+        $this->assertTrue($caught, "Text '$text' has been found");
+    }
+
+    /**
      * Checks, that the page should contains specified text after timeout
      *
      * @Then (I )wait until I see :text
@@ -166,12 +193,30 @@ class BrowserContext extends BaseContext
      */
     public function iWaitSecondsUntilISeeInTheElement($count, $text, $element)
     {
+        $startTime = time();
         $this->iWaitSecondsForElement($count, $element);
 
         $expected = str_replace('\\"', '"', $text);
-        $node = $this->getSession()->getPage()->find('css', $element);
         $message = "The text '$expected' was not found after a $count seconds timeout";
 
+        $found = false;
+        do {
+            try {
+                usleep(1000);
+                $node = $this->getSession()->getPage()->find('css', $element);
+                $this->assertContains($expected, $node->getText(), $message);
+                return;
+            }
+            catch (ExpectationException $e) {
+                /* Intentionally leave blank */
+            }
+            catch (StaleElementReference $e) {
+                // assume page reloaded whilst we were still waiting
+            }
+        } while (!$found && (time() - $startTime < $count));
+
+        // final assertion...
+        $node = $this->getSession()->getPage()->find('css', $element);
         $this->assertContains($expected, $node->getText(), $message);
     }
 
@@ -180,7 +225,7 @@ class BrowserContext extends BaseContext
      */
     public function iWaitSeconds($count)
     {
-        sleep($count);
+        usleep($count * 1000000);
     }
 
     /**
@@ -212,22 +257,24 @@ class BrowserContext extends BaseContext
     {
         $found = false;
         $startTime = time();
+        $e = null;
 
         do {
             try {
+                usleep(1000);
                 $node = $this->getSession()->getPage()->findAll('css', $element);
                 $this->assertCount(1, $node);
                 $found = true;
             }
             catch (ExpectationException $e) {
-                /* Intentionnaly leave blank */
+                /* Intentionally leave blank */
             }
         }
-        while (time() - $startTime < $count);
+        while (!$found && (time() - $startTime < $count));
 
         if ($found === false) {
             $message = "The element '$element' was not found after a $count seconds timeout";
-            throw new ResponseTextException($message, $this->getSession(), $e);
+            throw new ResponseTextException($message, $this->getSession()->getDriver(), $e);
         }
     }
 
@@ -306,7 +353,7 @@ class BrowserContext extends BaseContext
         $obj = $this->getSession()->getPage()->findField($select);
         if ($obj === null) {
             throw new ElementNotFoundException(
-                $this->getSession(), 'select box', 'id|name|label|value', $select
+                $this->getSession()->getDriver(), 'select box', 'id|name|label|value', $select
             );
         }
         $optionText = $obj->getText();
@@ -377,5 +424,33 @@ class BrowserContext extends BaseContext
     public function switchToMainFrame()
     {
         $this->getSession()->switchToIFrame();
+    }
+
+    /**
+     * test time from when the scenario started
+     *
+     * @Then (the )total elapsed time should be :comparison than :expected seconds
+     * @Then (the )total elapsed time should be :comparison to :expected seconds
+     */
+    public function elapsedTime($comparison, $expected)
+    {
+        $elapsed = time() - $this->timerStartedAt;
+
+        switch ($comparison) {
+            case 'less':
+                $this->assertTrue($elapsed < $expected, "Elapsed time '$elapsed' is not less than '$expected' seconds.");
+                break;
+
+            case 'more':
+                $this->assertTrue($elapsed > $expected, "Elapsed time '$elapsed' is not more than '$expected' seconds.");
+                break;
+
+            case 'equal':
+                $this->assertTrue($elapsed === $expected, "Elapsed time '$elapsed' is not '$expected' seconds.");
+                break;
+
+            default:
+                throw new PendingException("Unknown comparison '$comparison'. Use 'less', 'more' or 'equal'");
+        }
     }
 }

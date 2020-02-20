@@ -1,21 +1,18 @@
 <?php
 
-namespace Sanpi\Behatch\Context;
+namespace Behatch\Context;
 
-use Behat\Gherkin\Node\TableNode;
-use Sanpi\Behatch\HttpCall\Request;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Exception\ExpectationException;
+use Behatch\HttpCall\Request;
 
 class RestContext extends BaseContext
 {
-    private $request;
-
     /**
-     * Used to store key/values to be used in steps
-     *
-     * @var array
+     * @var Request
      */
-    private $storedVars = [];
+    protected $request;
 
     public function __construct(Request $request)
     {
@@ -27,13 +24,13 @@ class RestContext extends BaseContext
      *
      * @Given I send a :method request to :url
      */
-    public function iSendARequestTo($method, $url, PyStringNode $body = null)
+    public function iSendARequestTo($method, $url, PyStringNode $body = null, $files = [])
     {
         return $this->request->send(
             $method,
             $this->locatePath($url),
             [],
-            [],
+            $files,
             $body !== null ? $body->getRaw() : null
         );
     }
@@ -43,12 +40,12 @@ class RestContext extends BaseContext
      *
      * @Given I send a :method request to :url with parameters:
      */
-    public function iSendARequestToWithParameters($method, $url, TableNode $datas)
+    public function iSendARequestToWithParameters($method, $url, TableNode $data)
     {
         $files = [];
         $parameters = [];
 
-        foreach ($datas->getHash() as $row) {
+        foreach ($data->getHash() as $row) {
             if (!isset($row['key']) || !isset($row['value'])) {
                 throw new \Exception("You must provide a 'key' and 'value' column in your table node.");
             }
@@ -57,11 +54,9 @@ class RestContext extends BaseContext
                 $files[$row['key']] = rtrim($this->getMinkParameter('files_path'), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.substr($row['value'],1);
             }
             else {
-                $parameters[] = sprintf('%s=%s', $row['key'], $row['value']);
+                $parameters[$row['key']] = $row['value'];
             }
         }
-
-        parse_str(implode('&', $parameters), $parameters);
 
         return $this->request->send(
             $method,
@@ -78,19 +73,20 @@ class RestContext extends BaseContext
      */
     public function iSendARequestToWithBody($method, $url, PyStringNode $body)
     {
-        $this->iSendARequestTo($method, $url, $body);
+        return $this->iSendARequestTo($method, $url, $body);
     }
 
     /**
      * Checks, whether the response content is equal to given text
      *
      * @Then the response should be equal to
+     * @Then the response should be equal to:
      */
     public function theResponseShouldBeEqualTo(PyStringNode $expected)
     {
         $expected = str_replace('\\"', '"', $expected);
         $actual   = $this->request->getContent();
-        $message = "The string '$expected' is not equal to the response of the current page";
+        $message = "Actual response is '$actual', but expected '$expected'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -102,7 +98,7 @@ class RestContext extends BaseContext
     public function theResponseShouldBeEmpty()
     {
         $actual = $this->request->getContent();
-        $message = 'The response of the current page is not empty';
+        $message = "The response of the current page is not empty, it is: $actual";
         $this->assertTrue(null === $actual || "" === $actual, $message);
     }
 
@@ -115,8 +111,32 @@ class RestContext extends BaseContext
     {
         $actual = $this->request->getHttpHeader($name);
         $this->assertEquals(strtolower($value), strtolower($actual),
-            "The header '$name' is equal to '$actual'"
+            "The header '$name' should be equal to '$value', but it is: '$actual'"
         );
+    }
+
+    /**
+    * Checks, whether the header name is not equal to given text
+    *
+    * @Then the header :name should not be equal to :value
+    */
+    public function theHeaderShouldNotBeEqualTo($name, $value) {
+        $actual = $this->getSession()->getResponseHeader($name);
+        if (strtolower($value) == strtolower($actual)) {
+            throw new ExpectationException(
+                "The header '$name' is equal to '$actual'",
+                $this->getSession()->getDriver()
+            );
+        }
+    }
+
+    public function theHeaderShouldBeContains($name, $value)
+    {
+        trigger_error(
+            sprintf('The %s function is deprecated since version 3.1 and will be removed in 4.0. Use the %s::theHeaderShouldContain function instead.', __METHOD__, __CLASS__),
+            E_USER_DEPRECATED
+        );
+        $this->theHeaderShouldContain($name, $value);
     }
 
     /**
@@ -124,10 +144,11 @@ class RestContext extends BaseContext
      *
      * @Then the header :name should contain :value
      */
-    public function theHeaderShouldBeContains($name, $value)
+    public function theHeaderShouldContain($name, $value)
     {
-        $this->assertContains($value, $this->request->getHttpHeader($name),
-            "The header '$name' doesn't contain '$value'"
+        $actual = $this->request->getHttpHeader($name);
+        $this->assertContains($value, $actual,
+            "The header '$name' should contain value '$value', but actual value is '$actual'"
         );
     }
 
@@ -155,23 +176,47 @@ class RestContext extends BaseContext
         }, "The header '$name' exists");
     }
 
-    /**
-     * @Then the header :name should exist
-     */
-    public function theHeaderShouldExist($name)
+    protected function theHeaderShouldExist($name)
     {
         return $this->request->getHttpHeader($name);
     }
 
     /**
+     * @Then the header :name should match :regex
+     */
+    public function theHeaderShouldMatch($name, $regex)
+    {
+        $actual = $this->request->getHttpHeader($name);
+
+        $this->assertEquals(
+            1,
+            preg_match($regex, $actual),
+            "The header '$name' should match '$regex', but it is: '$actual'"
+        );
+    }
+
+    /**
+     * @Then the header :name should not match :regex
+     */
+    public function theHeaderShouldNotMatch($name, $regex)
+    {
+        $this->not(
+            function () use ($name, $regex) {
+                $this->theHeaderShouldMatch($name, $regex);
+            },
+            "The header '$name' should not match '$regex'"
+        );
+    }
+
+   /**
      * Checks, that the response header expire is in the future
      *
      * @Then the response should expire in the future
      */
     public function theResponseShouldExpireInTheFuture()
     {
-        $date = new \DateTime($this->request->getHttpHeader('Date'));
-        $expires = new \DateTime($this->request->getHttpHeader('Expires'));
+        $date = new \DateTime($this->request->getHttpRawHeader('Date')[0]);
+        $expires = new \DateTime($this->request->getHttpRawHeader('Expires')[0]);
 
         $this->assertSame(1, $expires->diff($date)->invert,
             sprintf('The response doesn\'t expire in the future (%s)', $expires->format(DATE_ATOM))
@@ -198,7 +243,7 @@ class RestContext extends BaseContext
             throw new \Exception("The response is not encoded in $encoding");
         }
 
-        $this->theHeaderShouldBeContains('Content-Type', "charset=$encoding");
+        $this->theHeaderShouldContain('Content-Type', "charset=$encoding");
     }
 
     /**
@@ -239,84 +284,5 @@ class RestContext extends BaseContext
         }
 
         echo "curl -X $method$data$headers '$url'";
-    }
-
-    /**
-     * Store given variable in array
-     *
-     * @param string $text
-     *
-     * @Then /^I want to store the "([^"]*)" property from response in stored values$/
-     */
-    public function storeVarInStoredVars($text)
-    {
-        $actual = json_decode($this->request->getContent());
-        $this->storedVars[$text] = $actual->$text;
-    }
-
-    /**
-     * Store given variable in array
-     *
-     * @param string $value
-     * @param string $compareWith
-     *
-     * @Then /^I want to compare the "([^"]*)" value from response with "([^"]*)" in stored values$/
-     */
-    public function compareVarToStoredVar($value, $compareWith)
-    {
-        $actual = json_decode($this->request->getContent());
-        $responseValue = $actual->$value;
-        $this->assertEquals($this->storedVars[$compareWith], $responseValue);
-    }
-
-    /**
-     * Remove given variable in stored vars
-     *
-     * @param string $text
-     *
-     * @Then /^I want to remove the "([^"]*)" property from stored values$/
-     */
-    public function removeVarInStoredVars($text)
-    {
-        unset($this->storedVars[$text]);
-    }
-
-    /**
-     * Set header from stored vars
-     *
-     * @param string $headerName
-     * @param string $var
-     *
-     * @Then /^I set header "([^"]*)" with value "([^"]*)" from stored values$/
-     */
-    public function setHeaderFromStoredVars($headerName, $var)
-    {
-        $this->request->setHttpHeader($headerName, $this->storedVars[$var]);
-    }
-
-    /**
-     * Set OAuth Authorization header from stored vars
-     *
-     * @param string $storedVarName
-     *
-     * @Then /^I set authorization header with value "([^"]*)" from stored values$/
-     */
-    public function setAuthorizationHeaderFromStoredVars($storedVarName)
-    {
-        $headerValue = sprintf('Bearer %s', $this->storedVars[$storedVarName]);
-
-        $this->request->setHttpHeader("Authorization", $headerValue);
-    }
-
-    /**
-     * Store a value from Request Headers in array
-     *
-     * @param $name
-     * @Then /^I want to store the "([^"]*)" property from headers in stored values$/
-     */
-    public function storeVarFromHeadersInStoredVars($name)
-    {
-        $value = $this->request->getHttpHeader($name);
-        $this->storedVars[$name] = $value;
     }
 }
